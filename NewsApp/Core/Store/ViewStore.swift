@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-@dynamicMemberLookup
+@MainActor
 final class ViewStore<ViewState, ViewEvent>: ObservableObject {
     private let eventHandler: (ViewEvent) -> Void
     private var cancellable: AnyCancellable?
@@ -14,6 +14,7 @@ final class ViewStore<ViewState, ViewEvent>: ObservableObject {
         self.eventHandler = store.handle
         
         self.cancellable = store.statePublisher
+            .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 self?.state = state
             }

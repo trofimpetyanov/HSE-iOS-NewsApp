@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class NewsStore: Store {
     @Published private(set) var state: NewsState
     var statePublisher: Published<NewsState>.Publisher { $state }
@@ -39,15 +40,11 @@ final class NewsStore: Store {
         
         do {
             let news = try await dependenciesContainer.newsService.fetchNews()
-            await MainActor.run {
-                state.articles = news.news
-                state.isLoading = false
-            }
+            state.articles = news.news
+            state.isLoading = false
         } catch {
-            await MainActor.run {
-                state.error = error
-                state.isLoading = false
-            }
+            state.error = error
+            state.isLoading = false
         }
     }
 }

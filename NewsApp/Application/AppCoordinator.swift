@@ -1,16 +1,18 @@
 import UIKit
 
+@MainActor
 protocol AppCoordinating: Coordinator {
     func showNews()
 }
 
+@MainActor
 final class AppCoordinator: AppCoordinating {
-    var navigationController: UINavigationController
+    let navigationController: UINavigationController
     var parentCoordinator: Coordinator?
     var childCoordinators: [Coordinator] = []
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
+    init() {
+        self.navigationController = UINavigationController()
     }
     
     func start() {

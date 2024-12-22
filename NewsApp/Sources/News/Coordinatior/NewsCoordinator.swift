@@ -1,11 +1,13 @@
 import UIKit
 import SafariServices
 
+@MainActor
 protocol NewsCoordinating: Coordinator {
     func showArticleDetails(url: URL)
     func showShareSheet(for article: Article)
 }
 
+@MainActor
 final class NewsCoordinator: NewsCoordinating {
     var navigationController: UINavigationController
     var parentCoordinator: Coordinator?

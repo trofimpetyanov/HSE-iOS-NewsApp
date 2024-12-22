@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 struct NewsSceneBuilder {
     func build(
         dependenciesContainer: NewsDependenciesContainer,

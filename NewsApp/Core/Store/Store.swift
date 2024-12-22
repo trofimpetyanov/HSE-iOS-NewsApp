@@ -1,5 +1,6 @@
 import Combine
 
+@MainActor
 protocol Store {
     associatedtype State
     associatedtype Event

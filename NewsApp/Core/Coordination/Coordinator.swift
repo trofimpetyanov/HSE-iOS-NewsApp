@@ -1,5 +1,6 @@
 import UIKit
 
+@MainActor
 protocol Coordinator: AnyObject {
     var navigationController: UINavigationController { get }
     var parentCoordinator: Coordinator? { get set }
@@ -9,6 +10,7 @@ protocol Coordinator: AnyObject {
     func finish()
 }
 
+@MainActor
 extension Coordinator {
     func finish() {
         parentCoordinator?.removeChild(self)

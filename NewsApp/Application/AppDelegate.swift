@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  NewsApp
-//
-//  Created by Trofim Petianov on 22.12.2024.
-//
-
 import UIKit
 
 @main
