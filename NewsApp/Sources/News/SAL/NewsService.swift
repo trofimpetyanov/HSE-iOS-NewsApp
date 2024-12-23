@@ -12,14 +12,20 @@ final class NewsService {
     func fetchNews(
         rubricId: Int = 4,
         pageIndex: Int = 1,
-        pageSize: Int = 20
+        pageSize: Int = 10
     ) async throws -> NewsResponse {
-        let request = NewsAPI.FetchNews(
-            rubricId: rubricId,
-            pageIndex: pageIndex,
-            pageSize: pageSize
-        )
-        let dto = try await apiClient.send(request)
-        return dtoConverter.convert(from: dto)
+        do {
+            let request = NewsAPI.FetchNews(
+                rubricId: rubricId,
+                pageIndex: pageIndex,
+                pageSize: pageSize
+            )
+            let dto = try await apiClient.send(request)
+            return dtoConverter.convert(from: dto)
+        } catch is DecodingError {
+            throw NewsError.parsing
+        } catch {
+            throw NewsError.network
+        }
     }
 } 

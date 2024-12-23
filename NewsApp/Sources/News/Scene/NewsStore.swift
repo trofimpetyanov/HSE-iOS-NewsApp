@@ -6,27 +6,35 @@ final class NewsStore: Store {
     var statePublisher: Published<NewsState>.Publisher { $state }
     
     private let dependenciesContainer: NewsDependenciesContainer
+    private let newsService: NewsService
     private let coordinator: NewsCoordinator
+    
+    private var currentPage = 1
+    private var isLoadingMore = false
 
     init(
         dependenciesContainer: NewsDependenciesContainer,
         coordinator: NewsCoordinator
     ) {
         self.state = NewsState()
+        self.newsService = dependenciesContainer.newsService
         self.dependenciesContainer = dependenciesContainer
         self.coordinator = coordinator
     }
 
     func handle(_ event: NewsEvent) {
         switch event {
-        case .viewDidLoad:
+        case .viewDidLoad, .refresh:
+            currentPage = 1
             Task { await loadNews() }
             
-        case .refresh:
-            Task { await loadNews() }
+        case .loadMore:
+            guard !isLoadingMore else { return }
+            currentPage += 1
+            Task { await loadNews(isLoadingMore: true) }
             
         case .selectArticle(let article):
-            if let url = URL(string: "https://news.myseldon.com/ru/news/index/\(article.id)") {
+            if let url = URLService.makeURL(for: .article(id: article.id)) {
                 coordinator.showArticleDetails(url: url)
             }
             
@@ -35,16 +43,42 @@ final class NewsStore: Store {
         }
     }
     
-    private func loadNews() async {
-        state.isLoading = true
+    private func loadNews(isLoadingMore: Bool = false) async {
+        if !isLoadingMore {
+            state.isLoading = true
+            state.error = nil
+        }
+        self.isLoadingMore = isLoadingMore
         
         do {
-            let news = try await dependenciesContainer.newsService.fetchNews()
-            state.articles = news.news
-            state.isLoading = false
-        } catch {
+            let news = try await newsService.fetchNews(
+                pageIndex: currentPage
+            )
+            
+            if news.news.isEmpty {
+                state.error = .noData
+                state.isLoading = false
+                self.isLoadingMore = false
+                return
+            }
+            
+            await MainActor.run {
+                if isLoadingMore {
+                    state.articles.append(contentsOf: news.news)
+                } else {
+                    state.articles = news.news
+                }
+                state.isLoading = false
+                self.isLoadingMore = false
+            }
+        } catch let error as NewsError {
             state.error = error
             state.isLoading = false
+            self.isLoadingMore = false
+        } catch {
+            state.error = .network
+            state.isLoading = false
+            self.isLoadingMore = false
         }
     }
 }

@@ -8,14 +8,12 @@ enum NewsAPI {
         let pageIndex: Int
         let pageSize: Int
         
-        var path: String { "/Section" }
-        
-        var queryItems: [URLQueryItem]? {
-            [
-                URLQueryItem(name: "rubricId", value: "\(rubricId)"),
-                URLQueryItem(name: "pageIndex", value: "\(pageIndex)"),
-                URLQueryItem(name: "pageSize", value: "\(pageSize)")
-            ]
+        var endpoint: URLService.Endpoint {
+            .section(
+                rubricId: rubricId,
+                pageIndex: pageIndex,
+                pageSize: pageSize
+            )
         }
     }
 } 

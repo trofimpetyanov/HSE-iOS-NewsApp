@@ -31,6 +31,14 @@ struct NewsDTOConverter {
     
     private func parseDate(_ dateString: String) -> Date {
         let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        
+        if let date = formatter.date(from: dateString) {
+            return date
+        }
+        
+        formatter.formatOptions = [.withInternetDateTime]
         return formatter.date(from: dateString) ?? Date()
     }
 } 

@@ -5,4 +5,4 @@ struct ArticleImage {
     let isRemote: Bool
 }
 
-extension ArticleImage: Equatable { }
+extension ArticleImage: Equatable, Hashable { }

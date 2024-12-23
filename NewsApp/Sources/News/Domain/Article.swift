@@ -24,4 +24,4 @@ struct Article {
     }
 } 
 
-extension Article: Identifiable, Equatable { }
+extension Article: Identifiable, Equatable, Hashable { }
