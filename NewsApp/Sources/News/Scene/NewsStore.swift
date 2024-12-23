@@ -24,7 +24,7 @@ final class NewsStore: Store {
 
     func handle(_ event: NewsEvent) {
         switch event {
-        case .viewDidLoad, .refresh:
+        case .viewDidLoad, .refresh, .retry:
             currentPage = 1
             Task { await loadNews() }
             
@@ -44,10 +44,6 @@ final class NewsStore: Store {
     }
     
     private func loadNews(isLoadingMore: Bool = false) async {
-        if !isLoadingMore {
-            state.isLoading = true
-            state.error = nil
-        }
         self.isLoadingMore = isLoadingMore
         
         do {
@@ -68,16 +64,19 @@ final class NewsStore: Store {
                 } else {
                     state.articles = news.news
                 }
+                state.error = nil
                 state.isLoading = false
                 self.isLoadingMore = false
             }
         } catch let error as NewsError {
             state.error = error
             state.isLoading = false
+            state.articles.removeAll()
             self.isLoadingMore = false
         } catch {
             state.error = .network
             state.isLoading = false
+            state.articles.removeAll()
             self.isLoadingMore = false
         }
     }

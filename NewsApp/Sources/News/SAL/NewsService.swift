@@ -21,9 +21,23 @@ final class NewsService {
                 pageSize: pageSize
             )
             let dto = try await apiClient.send(request)
+            
+            guard !dto.news.isEmpty else {
+                throw NewsError.noData
+            }
+            
             return dtoConverter.convert(from: dto)
         } catch is DecodingError {
             throw NewsError.parsing
+        } catch let error as APIError {
+            switch error {
+            case .unauthorized:
+                throw NewsError.serverError("Unauthorized access")
+            case .notFound:
+                throw NewsError.serverError("Content not found")
+            default:
+                throw NewsError.network
+            }
         } catch {
             throw NewsError.network
         }

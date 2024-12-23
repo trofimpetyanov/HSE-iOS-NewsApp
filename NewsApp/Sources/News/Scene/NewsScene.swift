@@ -16,6 +16,7 @@ enum NewsEvent {
     case viewDidLoad
     case refresh
     case loadMore
+    case retry
     case selectArticle(Article)
     case shareArticle(Article)
 }

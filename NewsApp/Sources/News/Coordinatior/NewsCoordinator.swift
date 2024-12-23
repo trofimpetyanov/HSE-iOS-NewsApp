@@ -47,11 +47,12 @@ final class NewsCoordinator: NewsCoordinating {
         let activityViewController = UIActivityViewController(
             activityItems: [
                 article.title,
-                article.announce
+                article.announce,
+                URLService.articleShareURL(id: article.id)
             ],
             applicationActivities: nil
         )
         
         navigationController.present(activityViewController, animated: true)
     }
-} 
+}
