@@ -26,9 +26,6 @@ final class NewsView: UIView {
         
         enum Error {
             static let imageName = "exclamationmark.triangle.fill"
-            static let imagePadding: CGFloat = 20
-            static let imageSize: CGFloat = 48
-            static let spacing: CGFloat = 16
         }
     }
     
@@ -150,6 +147,9 @@ extension NewsView: UICollectionViewDelegate {
     ) {
         guard let article = dataSource.itemIdentifier(for: indexPath)
         else { return }
+        
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
         
         onArticleSelected?(article)
     }

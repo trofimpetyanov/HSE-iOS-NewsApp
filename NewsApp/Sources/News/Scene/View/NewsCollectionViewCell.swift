@@ -93,6 +93,12 @@ final class NewsCollectionViewCell: UICollectionViewCell {
         return stack
     }()
     
+    override var isHighlighted: Bool {
+        didSet {
+            handleHighlighted()
+        }
+    }
+    
     // MARK: - Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -103,7 +109,28 @@ final class NewsCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Setup
+    // MARK: - Methods
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        newsImageView.reset()
+        sourceIconView.reset()
+    }
+    
+    func configure(with article: Article) {
+        if let imageURL = article.image?.url {
+            newsImageView.loadImage(from: imageURL)
+        }
+        
+        sourceIconView.loadImage(from: article.sourceIcon)
+        sourceTitleLabel.text = article.sourceName
+        titleLabel.text = article.title
+        descriptionLabel.text = article.announce
+        
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        dateLabel.text = formatter.localizedString(for: article.date, relativeTo: Date())
+    }
+    
     private func setupUI() {
         contentView.addSubview(containerView)
         containerView.pinHorizontal(to: contentView, Constants.Spacing.l)
@@ -123,25 +150,29 @@ final class NewsCollectionViewCell: UICollectionViewCell {
         contentStackView.pinBottom(to: containerView, Constants.Spacing.m)
     }
     
-    // MARK: - Configuration
-    func configure(with article: Article) {
-        if let imageURL = article.image?.url {
-            newsImageView.loadImage(from: imageURL)
-        }
+    func handleHighlighted() {
+        UIView.animate(
+            withDuration: 0.4,
+            delay: 0,
+            usingSpringWithDamping: 0.5,
+            initialSpringVelocity: 1,
+            options: [.allowUserInteraction, .curveEaseInOut],
+            animations: {
+                self.containerView.transform = self.isHighlighted ?
+                CGAffineTransform(scaleX: 0.96, y: 0.96) :
+                .identity
+            }
+        )
         
-        sourceIconView.loadImage(from: article.sourceIcon)
-        sourceTitleLabel.text = article.sourceName
-        titleLabel.text = article.title
-        descriptionLabel.text = article.announce
-        
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
-        dateLabel.text = formatter.localizedString(for: article.date, relativeTo: Date())
+        UIView.animate(
+            withDuration: 0.2,
+            delay: 0,
+            options: [.allowUserInteraction],
+            animations: {
+                self.containerView.backgroundColor = self.isHighlighted ?
+                    .tertiarySystemGroupedBackground :
+                    .secondarySystemGroupedBackground
+            }
+        )
     }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        newsImageView.reset()
-        sourceIconView.reset()
-    }
-} 
+}

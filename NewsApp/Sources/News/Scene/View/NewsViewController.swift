@@ -79,30 +79,36 @@ final class NewsViewController: UIViewController {
     }
     
     private func configureContentState(for state: NewsState) {
-        if state.isLoading && state.articles.isEmpty {
-            var configuration = UIContentUnavailableConfiguration.loading()
-            configuration.text = Constants.Loading.title
-            configuration.secondaryText = Constants.Loading.message
-            contentUnavailableConfiguration = configuration
-        } else if let error = state.error {
-            var configuration = UIContentUnavailableConfiguration.empty()
-            configuration.image = UIImage(systemName: Constants.Error.imageName)
-            configuration.text = error.localizedDescription
-            configuration.secondaryText = error.recoverySuggestion
+        let animator = UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut) {
+            if state.isLoading && state.articles.isEmpty {
+                var configuration = UIContentUnavailableConfiguration.loading()
+                configuration.text = Constants.Loading.title
+                configuration.secondaryText = Constants.Loading.message
+                self.contentUnavailableConfiguration = configuration
+            } else if let error = state.error {
+                var configuration = UIContentUnavailableConfiguration.empty()
+                configuration.image = UIImage(systemName: Constants.Error.imageName)
+                configuration.text = error.localizedDescription
+                configuration.secondaryText = error.recoverySuggestion
 
-            var buttonConfiguration = UIButton.Configuration.filled()
-            buttonConfiguration.title = Constants.Error.buttonTitle
-            buttonConfiguration.cornerStyle = .large
-        
-            configuration.button = buttonConfiguration
-            configuration.buttonProperties.primaryAction = UIAction { [weak self] _ in
-                self?.viewStore.handle(.retry)
-            }
+                var buttonConfiguration = UIButton.Configuration.filled()
+                buttonConfiguration.title = Constants.Error.buttonTitle
+                buttonConfiguration.cornerStyle = .large
             
-            contentUnavailableConfiguration = configuration
-        } else {
-            contentUnavailableConfiguration = nil
+                configuration.button = buttonConfiguration
+                configuration.buttonProperties.primaryAction = UIAction { [weak self] _ in
+                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                    generator.impactOccurred()
+                    
+                    self?.viewStore.handle(.retry)
+                }
+                
+                self.contentUnavailableConfiguration = configuration
+            } else {
+                self.contentUnavailableConfiguration = nil
+            }
         }
+        animator.startAnimation()
     }
     
 }
