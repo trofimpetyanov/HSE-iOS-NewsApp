@@ -4,7 +4,7 @@ final class NewsService {
     private let apiClient: APIClient
     private let dtoConverter: NewsDTOConverter
     
-    init(apiClient: APIClient, dtoConverter: NewsDTOConverter) {
+    init(apiClient: APIClient = APIClient(urlService: .news), dtoConverter: NewsDTOConverter = NewsDTOConverter()) {
         self.apiClient = apiClient
         self.dtoConverter = dtoConverter
     }

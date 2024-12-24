@@ -6,7 +6,7 @@ final class NewsDependenciesContainer {
     let newsService: NewsService
     
     init(
-        apiClient: APIClient = APIClient(),
+        apiClient: APIClient = APIClient(urlService: .news),
         dtoConverter: NewsDTOConverter = NewsDTOConverter()
     ) {
         self.apiClient = apiClient

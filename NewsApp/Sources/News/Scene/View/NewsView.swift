@@ -34,8 +34,8 @@ final class NewsView: UIView {
     var onArticleShare: ((Article) -> Void)?
     var onRefresh: (() -> Void)?
     var onLoadMore: (() -> Void)?
-    var onRetry: (() -> Void)?
     
+    // MARK: UI Components
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
@@ -44,6 +44,17 @@ final class NewsView: UIView {
         collectionView.backgroundColor = .systemGroupedBackground
         collectionView.delegate = self
         return collectionView
+    }()
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.addAction(
+            UIAction { [weak self] _ in
+                self?.onRefresh?()
+            },
+            for: .valueChanged
+        )
+        return control
     }()
     
     private let cellRegistration = UICollectionView.CellRegistration<NewsCollectionViewCell, Article> { cell, _, article in
@@ -62,20 +73,7 @@ final class NewsView: UIView {
         }
     }()
     
-    private lazy var refreshControl: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addAction(
-            UIAction { [weak self] _ in
-                self?.onRefresh?()
-            },
-            for: .valueChanged
-        )
-        return refreshControl
-    }()
-    
-    private var articles: [Article] = []
-    
-    // MARK: - Init
+    // MARK: - Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -86,15 +84,22 @@ final class NewsView: UIView {
     }
     
     // MARK: - Methods
-    private func setupUI() {
-        backgroundColor = .systemGroupedBackground
+    // MARK: Configure
+    func configure(with state: NewsState) {
+        applySnapshot(with: state.articles)
         
+        if !state.isLoading {
+            DispatchQueue.main.async { [weak self] in
+                self?.refreshControl.endRefreshing()
+            }
+        }
+    }
+    
+    // MARK: - Private Methods
+    private func setupUI() {
         addSubview(collectionView)
         collectionView.pin(to: self)
-        
         collectionView.refreshControl = refreshControl
-        
-        collectionView.backgroundView = UIView()
     }
     
     private func createLayout() -> UICollectionViewLayout {
@@ -120,23 +125,12 @@ final class NewsView: UIView {
         return UICollectionViewCompositionalLayout(section: section)
     }
     
-    func configure(with state: NewsState) {
-        applySnapshot(with: state.articles)
-        
-        if !state.isLoading {
-            DispatchQueue.main.async { [weak self] in
-                self?.refreshControl.endRefreshing()
-            }
-        }
-    }
-    
     private func applySnapshot(with articles: [Article]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Article>()
         snapshot.appendSections([.main])
         snapshot.appendItems(articles)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
-    
 }
 
 // MARK: - UICollectionViewDelegate

@@ -21,7 +21,7 @@ final class NewsCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    // MARK: - Views
+    // MARK: - UI Components
     private lazy var containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemGroupedBackground
@@ -93,6 +93,7 @@ final class NewsCollectionViewCell: UICollectionViewCell {
         return stack
     }()
     
+    // MARK: - Properties
     override var isHighlighted: Bool {
         didSet {
             handleHighlighted()
@@ -131,6 +132,7 @@ final class NewsCollectionViewCell: UICollectionViewCell {
         dateLabel.text = formatter.localizedString(for: article.date, relativeTo: Date())
     }
     
+    // MARK: - Methods
     private func setupUI() {
         contentView.addSubview(containerView)
         containerView.pinHorizontal(to: contentView, Constants.Spacing.l)
@@ -150,7 +152,7 @@ final class NewsCollectionViewCell: UICollectionViewCell {
         contentStackView.pinBottom(to: containerView, Constants.Spacing.m)
     }
     
-    func handleHighlighted() {
+    private func handleHighlighted() {
         UIView.animate(
             withDuration: 0.4,
             delay: 0,
@@ -159,8 +161,8 @@ final class NewsCollectionViewCell: UICollectionViewCell {
             options: [.allowUserInteraction, .curveEaseInOut],
             animations: {
                 self.containerView.transform = self.isHighlighted ?
-                CGAffineTransform(scaleX: 0.96, y: 0.96) :
-                .identity
+                    CGAffineTransform(scaleX: 0.96, y: 0.96) :
+                    .identity
             }
         )
         

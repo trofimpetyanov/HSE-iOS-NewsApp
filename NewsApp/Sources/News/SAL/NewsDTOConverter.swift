@@ -10,13 +10,13 @@ struct NewsDTOConverter {
     
     private func convert(from dto: ArticleDTO) -> Article {
         Article(
-            id: dto.newsId,
+            id: dto.id,
             title: dto.title,
             announce: dto.announce,
             date: parseDate(dto.date),
             sourceIcon: dto.sourceIcon,
             sourceName: dto.sourceName,
-            image: dto.img.map(convert),
+            image: dto.image.map(convert),
             timeOfReading: dto.timeOfReading,
             sectionName: dto.sectionName
         )

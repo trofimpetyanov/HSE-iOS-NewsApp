@@ -48,7 +48,7 @@ final class NewsCoordinator: NewsCoordinating {
             activityItems: [
                 article.title,
                 article.announce,
-                URLService.articleShareURL(id: article.id)
+                URLService.news.articleShareURL(id: article.id)
             ],
             applicationActivities: nil
         )

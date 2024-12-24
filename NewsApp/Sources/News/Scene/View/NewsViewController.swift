@@ -3,6 +3,7 @@ import Combine
 
 final class NewsViewController: UIViewController {
     
+    // MARK: - Constants
     private enum Constants {
         static let title = "News"
         
@@ -17,10 +18,12 @@ final class NewsViewController: UIViewController {
         }
     }
     
+    // MARK: - Properties
     private let viewStore: ViewStore<NewsViewState, NewsViewEvent>
     private var theView: NewsView { view as! NewsView }
     private var observations: Set<AnyCancellable> = []
-
+    
+    // MARK: - Lifecycle
     init(viewStore: ViewStore<NewsViewState, NewsViewEvent>) {
         self.viewStore = viewStore
         super.init(nibName: nil, bundle: nil)
@@ -33,7 +36,7 @@ final class NewsViewController: UIViewController {
     override func loadView() {
         view = NewsView()
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigation()
@@ -41,11 +44,13 @@ final class NewsViewController: UIViewController {
         bindToView()
         viewStore.handle(.viewDidLoad)
     }
-
+    
+    // MARK: - Setup
     private func setupNavigation() {
         navigationItem.title = Constants.title
     }
-
+    
+    // MARK: - Bindings
     private func bind(to viewStore: ViewStore<NewsViewState, NewsViewEvent>) {
         viewStore
             .$state
@@ -55,7 +60,7 @@ final class NewsViewController: UIViewController {
             }
             .store(in: &observations)
     }
-
+    
     private func bindToView() {
         theView.onArticleSelected = { [weak self] article in
             self?.viewStore.handle(.selectArticle(article))
@@ -72,12 +77,9 @@ final class NewsViewController: UIViewController {
         theView.onLoadMore = { [weak self] in
             self?.viewStore.handle(.loadMore)
         }
-        
-        theView.onRetry = { [weak self] in
-            self?.viewStore.handle(.refresh)
-        }
     }
     
+    // MARK: - Configuration
     private func configureContentState(for state: NewsState) {
         let animator = UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut) {
             if state.isLoading && state.articles.isEmpty {
@@ -90,16 +92,15 @@ final class NewsViewController: UIViewController {
                 configuration.image = UIImage(systemName: Constants.Error.imageName)
                 configuration.text = error.localizedDescription
                 configuration.secondaryText = error.recoverySuggestion
-
+                
                 var buttonConfiguration = UIButton.Configuration.filled()
                 buttonConfiguration.title = Constants.Error.buttonTitle
                 buttonConfiguration.cornerStyle = .large
-            
+                
                 configuration.button = buttonConfiguration
                 configuration.buttonProperties.primaryAction = UIAction { [weak self] _ in
                     let generator = UIImpactFeedbackGenerator(style: .medium)
                     generator.impactOccurred()
-                    
                     self?.viewStore.handle(.retry)
                 }
                 
@@ -110,5 +111,4 @@ final class NewsViewController: UIViewController {
         }
         animator.startAnimation()
     }
-    
 }

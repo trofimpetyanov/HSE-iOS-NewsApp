@@ -34,7 +34,7 @@ final class NewsStore: Store {
             Task { await loadNews(isLoadingMore: true) }
             
         case .selectArticle(let article):
-            if let url = URLService.makeURL(for: .article(id: article.id)) {
+            if let url = URLService.news.makeURL(for: NewsEndpoint.article(id: article.id)) {
                 coordinator.showArticleDetails(url: url)
             }
             
@@ -58,16 +58,15 @@ final class NewsStore: Store {
                 return
             }
             
-            await MainActor.run {
-                if isLoadingMore {
-                    state.articles.append(contentsOf: news.news)
-                } else {
-                    state.articles = news.news
-                }
-                state.error = nil
-                state.isLoading = false
-                self.isLoadingMore = false
+            if isLoadingMore {
+                state.articles.append(contentsOf: news.news)
+            } else {
+                state.articles = news.news
             }
+            state.error = nil
+            state.isLoading = false
+            self.isLoadingMore = false
+            
         } catch let error as NewsError {
             state.error = error
             state.isLoading = false

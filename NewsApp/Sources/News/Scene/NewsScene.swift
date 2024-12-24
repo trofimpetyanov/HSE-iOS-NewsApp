@@ -15,8 +15,8 @@ struct NewsState: Equatable {
 enum NewsEvent {
     case viewDidLoad
     case refresh
-    case loadMore
     case retry
+    case loadMore
     case selectArticle(Article)
     case shareArticle(Article)
 }
