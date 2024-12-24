@@ -59,11 +59,14 @@ final class NewsStore: Store {
                 return
             }
             
+            let sortedNews = news.news.sorted(by: { $0.date > $1.date })
+            
             if isLoadingMore {
-                state.articles.append(contentsOf: news.news)
+                state.articles.append(contentsOf: sortedNews)
             } else {
-                state.articles = news.news
+                state.articles = sortedNews
             }
+            
             state.error = nil
             state.isLoading = false
             self.isLoadingMore = false
