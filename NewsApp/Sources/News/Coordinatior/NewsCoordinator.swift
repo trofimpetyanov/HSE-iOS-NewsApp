@@ -4,7 +4,7 @@ import SafariServices
 @MainActor
 protocol NewsCoordinating: Coordinator {
     func showArticleDetails(url: URL)
-    func showShareSheet(for article: Article)
+    func showShareSheet(with content: String)
 }
 
 @MainActor
@@ -43,13 +43,9 @@ final class NewsCoordinator: NewsCoordinating {
         navigationController.present(safariViewController, animated: true)
     }
     
-    func showShareSheet(for article: Article) {
+    func showShareSheet(with content: String) {
         let activityViewController = UIActivityViewController(
-            activityItems: [
-                article.title,
-                article.announce,
-                URLService.news.articleShareURL(id: article.id)
-            ],
+            activityItems: [content],
             applicationActivities: nil
         )
         
