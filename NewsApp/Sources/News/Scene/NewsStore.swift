@@ -39,7 +39,8 @@ final class NewsStore: Store {
             }
             
         case .shareArticle(let article):
-            coordinator.showShareSheet(for: article)
+            let content = "\(article.title)\n\(article.announce)\n\n\(URLService.news.articleShareURL(id: article.id))"
+            coordinator.showShareSheet(with: content)
         }
     }
     
